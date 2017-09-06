@@ -4,6 +4,8 @@
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
 
+#include "CoefDiffusion.h"
+
 template <>
 InputParameters
 validParams<diffusionBondingApp>()
@@ -46,6 +48,7 @@ diffusionBondingApp__registerObjects(Factory & factory)
 void
 diffusionBondingApp::registerObjects(Factory & factory)
 {
+	registerKernel(CoefDiffusion); 
 }
 
 // External entry point for dynamic syntax association
