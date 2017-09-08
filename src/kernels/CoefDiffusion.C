@@ -21,6 +21,8 @@ validParams<CoefDiffusion>()
   InputParameters params = validParams<Kernel>();
   params.addClassDescription("The Laplacian operator ($-\\nabla \\cdot \\nabla u$), with the weak "
                              "form of $(\\nabla \\phi_i, \\nabla u_h)$.");
+  params.addRequiredParam<Real>("length_scale","Length scale");
+  params.addRequiredParam<Real>("time_scale",  "Time scale");
   //params.addRequiredParam<std::vector<Real> >("diffusion_coefficient", "Value of the constant diffusion coefficient");
 //  params.addRequiredParam<Real>("kinetic_coefficient",   "Kinetic coefficient beta");
 //  params.addRequiredParam<Real>("interface_width","Numerical solid-liquid interface, usually 10-100 nm");
@@ -34,7 +36,10 @@ validParams<CoefDiffusion>()
 
 CoefDiffusion::CoefDiffusion(const InputParameters & parameters) 
 	: Kernel(parameters), 
-    _diffusion_coefficient_dimless( getMaterialProperty<Real>("diffusion_coefficient_dimless") )
+    _length_scale(getParam<Real>("length_scale")),
+    _time_scale(getParam<Real>("time_scale")),
+    _non_dimensionalizer( _time_scale/( _length_scale*_length_scale ) ),
+    _diffusion_coefficient( getMaterialProperty<Real>("diffusion_coefficient") )
 	/*
     _kinetic_coefficient(getParam<Real>("kinetic_coefficient")),
     _interface_width(getParam<Real>("interface_width")),
@@ -47,16 +52,17 @@ CoefDiffusion::CoefDiffusion(const InputParameters & parameters)
     _diffusion_coefficient_dimless( _diffusion_coefficient*_tau_0/(_interface_width*_interface_width) ) 
 	 */
 {
+    std::cout << "time_scale / length_scale^2 = " << _time_scale/(_length_scale*_length_scale) << std::endl; 
 }
 
 Real
 CoefDiffusion::computeQpResidual()
 {
-  return _diffusion_coefficient_dimless[_qp] * _grad_u[_qp] * _grad_test[_i][_qp];
+  return _non_dimensionalizer*_diffusion_coefficient[_qp] * _grad_u[_qp] * _grad_test[_i][_qp];
 }
 
 Real
 CoefDiffusion::computeQpJacobian()
 {
-  return _diffusion_coefficient_dimless[_qp] * _grad_phi[_j][_qp] * _grad_test[_i][_qp];
+  return _non_dimensionalizer*_diffusion_coefficient[_qp] * _grad_phi[_j][_qp] * _grad_test[_i][_qp];
 }

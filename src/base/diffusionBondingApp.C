@@ -7,6 +7,8 @@
 #include "CoefDiffusion.h"
 #include "DiffusionCoefficientsMaterial.h"
 
+#include "TemperatureRampFunction.h"
+
 template <>
 InputParameters
 validParams<diffusionBondingApp>()
@@ -50,7 +52,8 @@ void
 diffusionBondingApp::registerObjects(Factory & factory)
 {
 	registerKernel(CoefDiffusion); 
-	registerKernel(DiffusionCoefficientsMaterial); 
+	registerMaterial(DiffusionCoefficientsMaterial); 
+	registerFunction(TemperatureRampFunction); 
 }
 
 // External entry point for dynamic syntax association

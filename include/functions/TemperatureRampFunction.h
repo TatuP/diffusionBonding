@@ -12,44 +12,29 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef COEFDIFFUSION_H
-#define COEFDIFFUSION_H
+#ifndef TEMPERATURERAMPFUNCTION_H
+#define TEMPERATURERAMPFUNCTION_H
 
-#include "Kernel.h"
+#include "Function.h"
 
-class CoefDiffusion;
+class TemperatureRampFunction;
 
 template <>
-InputParameters validParams<CoefDiffusion>();
+InputParameters validParams<TemperatureRampFunction>();
 
-/**
- * This kernel implements the Laplacian operator:
- * $\nabla u \cdot \nabla \phi_i$
- */
-class CoefDiffusion : public Kernel
+class TemperatureRampFunction : public Function
 {
 public:
-  CoefDiffusion(const InputParameters & parameters);
+  TemperatureRampFunction(const InputParameters & parameters);
+
+  virtual Real value(Real t, const Point & p) override;
 
 protected:
-  virtual Real computeQpResidual() override;
-  virtual Real computeQpJacobian() override;
-private:
-  const Real _length_scale;
-  const Real _time_scale;
-  const Real _non_dimensionalizer; 
-  const MaterialProperty<Real> & _diffusion_coefficient; 
-  /*
-  const Real _kinetic_coefficient;
-  const Real _interface_width;
-  const Real _a1;
-  const Real _a2;
-  const Real _diffusion_coefficient;
-  const Real _capillary_length;
-  const Real _coupling_constant;
-  const Real _tau_0;
-  const Real _diffusion_coefficient_dimless;
-  */
+  Real _T_init_final;
+  Real _T_high;
+  Real _time_increase_decrease;
+  Real _time_hold_high;
+  Real _T_slope; 
 };
 
-#endif /* COEFDIFFUSION_H */
+#endif // EXAMPLEFUNCTION_H

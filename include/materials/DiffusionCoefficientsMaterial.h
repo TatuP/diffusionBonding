@@ -31,15 +31,22 @@ private:
   //MaterialProperty<Real> & _dtau_anisotropy_dop; 
 
   // earlier all of these were const
-  const Real _diffusion_coefficient_1;
-  const Real _diffusion_coefficient_2;
-  const Real _diffusion_coefficient_3;
-
+  const Real _R;
+  const Real _length_scale;
+  const Real _time_scale;
+  const Real _non_dimensionalizer; 
+  const Real _D_1_pre;
+  const Real _D_2_pre;
+  const Real _D_3_pre;
+  const Real _Q_1;
+  const Real _Q_2;
+  const Real _Q_3;
   const VariableValue & _phi_1;
   const VariableValue & _phi_2;
-  const VariableValue & _phi_3;
-
+  Function & _TemperatureRampFunction; 
   MaterialProperty<Real> & _diffusion_coefficient; 
+
+
 
 //  const VariableValue & _op;
 //  const VariableGradient & _grad_op;
