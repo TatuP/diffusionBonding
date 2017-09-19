@@ -4,7 +4,7 @@
 
 [GlobalParams]
   R = 8.3144598
-  length_scale = 0.1e-6 # 0.1 microns
+  length_scale = 0.5e-6 # 0.5 microns is the unit length
   time_scale = 60 # 60 seconds
 
   T_init_final = 800 # Room temperature
@@ -121,8 +121,14 @@
 # dU/dt = diffusion_coefficient*grad^2(U) + d(op_sum)/dt
   [./chromium_diffusion]
     type = CoefDiffusion # Custom diffusion laplacian kernel, with a predefined coefficient. 
+#    type = Diffusion
     variable = chromium
   [../] 
+
+#  [./chromium_diffusion]
+#    type = Diffusion # Custom diffusion laplacian kernel, with a predefined coefficient. 
+#    variable = chromium
+#  [../] 
 []
 
 [Functions]
@@ -178,8 +184,8 @@
 
 [Executioner]
   type = Transient # Type of executioner, here it is transient with an adaptive time step
-#  scheme = bdf2 # Type of time integration (2nd order backward euler), 
-  scheme = explicit-euler
+  scheme = bdf2 # Type of time integration (2nd order backward euler), 
+#  scheme = explicit-euler
                 # defaults to 1st order backward euler
 
   #Preconditioned JFNK (default)
@@ -191,7 +197,7 @@
   petsc_options_value = 'hypre boomeramg 101 ds'
 
   l_max_its = 30 # Max number of linear iterations
-  l_tol = 1e-4 # Relative tolerance for linear solves
+  l_tol = 0 # Relative tolerance for linear solves
   nl_max_its = 40 # Max number of nonlinear iterations
   nl_rel_tol = 1e-9 # 1e-10 # Absolute tolerance for nonlienar solves
  

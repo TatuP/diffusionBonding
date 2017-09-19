@@ -8,6 +8,8 @@
 #include "DiffusionCoefficientsMaterial.h"
 
 #include "TemperatureRampFunction.h"
+#include "MuDiffusion.h"
+//#include "ConcFromMuAux.h"
 
 template <>
 InputParameters
@@ -52,6 +54,8 @@ void
 diffusionBondingApp::registerObjects(Factory & factory)
 {
 	registerKernel(CoefDiffusion); 
+	registerKernel(MuDiffusion); 
+//	registerAux(ConcFromMuAux); 
 	registerMaterial(DiffusionCoefficientsMaterial); 
 	registerFunction(TemperatureRampFunction); 
 }

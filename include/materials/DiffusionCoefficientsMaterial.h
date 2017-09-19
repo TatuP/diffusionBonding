@@ -46,6 +46,19 @@ private:
   Function & _TemperatureRampFunction; 
   MaterialProperty<Real> & _diffusion_coefficient; 
 
+  const Real _c_eq_1; 
+  const Real _c_eq_2; 
+  const Real _c_eq_3; 
+  const Real _G_c_1; 
+  const Real _G_c_2; 
+  const Real _G_c_3; 
+  const Real _inv_G_cc_1; 
+  const Real _inv_G_cc_2; 
+  const Real _inv_G_cc_3; 
+  const VariableValue & _mu;
+  MaterialProperty<Real> & _concFromMu; 
+  MaterialProperty<Real> & _mobility; 
+
 
 
 //  const VariableValue & _op;

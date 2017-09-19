@@ -27,6 +27,18 @@ validParams<DiffusionCoefficientsMaterial>()
   params.addRequiredParam<FunctionName>("TemperatureRampFunction","Temperature ramp function name");
   params.addRequiredCoupledVar("phi_1", "Phase field of species 1");
   params.addRequiredCoupledVar("phi_2", "Phase field of species 2");
+
+
+  params.addRequiredParam<Real>("c_eq_1",  "equilibrium concentration for phase 1");
+  params.addRequiredParam<Real>("c_eq_2",  "equilibrium concentration for phase 2");
+  params.addRequiredParam<Real>("c_eq_3",  "equilibrium concentration for phase 2");
+  params.addRequiredParam<Real>("G_c_1",  "dG/dc for phase 1");
+  params.addRequiredParam<Real>("G_c_2",  "dG/dc for phase 2");
+  params.addRequiredParam<Real>("G_c_3",  "dG/dc for phase 2");
+  params.addRequiredParam<Real>("G_cc_1",  "d^2G/dc^2 for phase 1");
+  params.addRequiredParam<Real>("G_cc_2",  "d^2G/dc^2 for phase 2");
+  params.addRequiredParam<Real>("G_cc_3",  "d^2G/dc^2 for phase 2");
+  params.addRequiredCoupledVar("mu", "Diffusion potential of chromium");
   return params;
 }
 
@@ -46,7 +58,21 @@ DiffusionCoefficientsMaterial::DiffusionCoefficientsMaterial(const InputParamete
 	 _phi_1(coupledValue("phi_1")),
 	 _phi_2(coupledValue("phi_2")),
 	 _TemperatureRampFunction( getFunction("TemperatureRampFunction") ),
-    _diffusion_coefficient(declareProperty<Real>("diffusion_coefficient"))
+    _diffusion_coefficient(declareProperty<Real>("diffusion_coefficient")),
+
+    _c_eq_1( getParam<Real>("c_eq_1") ),
+    _c_eq_2( getParam<Real>("c_eq_2") ),
+    _c_eq_3( getParam<Real>("c_eq_3") ),
+    _G_c_1( getParam<Real>("G_c_1") ),
+    _G_c_2( getParam<Real>("G_c_2") ),
+    _G_c_3( getParam<Real>("G_c_3") ),
+    _inv_G_cc_1( ( getParam<Real>("G_cc_1") ) ),
+    _inv_G_cc_2( ( getParam<Real>("G_cc_2") ) ),
+    _inv_G_cc_3( ( getParam<Real>("G_cc_3") ) ),
+    _mu( coupledValue("mu") ),
+    _concFromMu(declareProperty<Real>("concFromMu")),
+    _mobility(declareProperty<Real>("mobility"))
+
 {
 	std::cout << "_non_dimensionalizer = " << _non_dimensionalizer << std::endl; 
 
@@ -72,8 +98,16 @@ DiffusionCoefficientsMaterial::computeQpProperties()
 	int current_node = 0;
 	const Real temperature = _TemperatureRampFunction.value( _t, current_node ); //, *_current_node ); 
 	const Real inv_RT = 1./(_R*temperature); 
-   _diffusion_coefficient[_qp] = (
-				                                    _phi_1[_qp] *_D_1_pre*std::exp( -_Q_1*inv_RT )
-                                +               _phi_2[_qp] *_D_2_pre*std::exp( -_Q_2*inv_RT )
-                                +(1-_phi_1[_qp]-_phi_2[_qp])*_D_3_pre*std::exp( -_Q_3*inv_RT ) );
+   Real _phi_3 = 1 - _phi_1[_qp] - _phi_2[_qp];
+   _diffusion_coefficient[_qp] = (  _phi_1[_qp]*_D_1_pre*std::exp( -_Q_1*inv_RT )
+                                  + _phi_2[_qp]*_D_2_pre*std::exp( -_Q_2*inv_RT )
+                                  + _phi_3     *_D_3_pre*std::exp( -_Q_3*inv_RT ) );
+
+   _concFromMu[_qp] =  _phi_1[_qp]*( _inv_G_cc_1*( _mu[_qp] - _G_c_1 ) + _c_eq_1 )
+                     + _phi_2[_qp]*( _inv_G_cc_2*( _mu[_qp] - _G_c_2 ) + _c_eq_2 )
+                     + _phi_3     *( _inv_G_cc_3*( _mu[_qp] - _G_c_3 ) + _c_eq_3 );
+
+   _mobility[_qp] = (  _phi_1[_qp]*_D_1_pre*std::exp( -_Q_1*inv_RT )*_inv_G_cc_1
+                     + _phi_2[_qp]*_D_2_pre*std::exp( -_Q_2*inv_RT )*_inv_G_cc_2
+                     + _phi_3     *_D_3_pre*std::exp( -_Q_3*inv_RT )*_inv_G_cc_3 );
 }
