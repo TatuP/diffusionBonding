@@ -9,6 +9,8 @@
 
 #include "TemperatureRampFunction.h"
 #include "MuDiffusion.h"
+
+#include "MuIC.h"
 //#include "ConcFromMuAux.h"
 
 template <>
@@ -58,6 +60,7 @@ diffusionBondingApp::registerObjects(Factory & factory)
 //	registerAux(ConcFromMuAux); 
 	registerMaterial(DiffusionCoefficientsMaterial); 
 	registerFunction(TemperatureRampFunction); 
+	registerInitialCondition(MuIC); 
 }
 
 // External entry point for dynamic syntax association
